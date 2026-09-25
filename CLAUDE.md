@@ -1,6 +1,6 @@
 # CLAUDE.md — working on this repo
 
-This repo is a **short reveal.js deck** (title + five slides): "Agents Need Context, Not Just Models",
+This repo is a **short reveal.js deck** (title + ten slides): "Agents Need Context, Not Just Models",
 Giordon Stark's contribution to the **UH Physics & Astronomy AI "rap session"**
 (2026-09-24, https://indico.phys.hawaii.edu/event/2985/). It is **public** and auto-deploys
 to GitHub Pages (https://kratsg.github.io/2026-09-24-uhawaii-colloquium-rap/).
@@ -18,15 +18,22 @@ It was cut down from the PyHEP.dev 2026 MCP deck (`kratsg/2026-09-08-pyhepdev-mc
 `arch-swap` / `arch-quiet` / `arch-intent` slides supply the big-picture framing. The
 citation-grade source for every claim is **`mcp-design-talk.md`** (committed).
 
-The slides (keep it short: the session asked for three per speaker):
+The slides (the session asked for three per speaker, so keep it tight):
 
-1. `title`: adapted from the PyHEP.dev title slide.
-2. `jfc`: bridge to the other rap talks (JFC paper arXiv:2603.20179, Kevin Flood's
-   factorized agent pipeline + authority gate, Zepeng Li's "models now handle research tasks").
-3. `arch-swap`: model / harness / facility context & tools; "where do my job outputs go?".
-4. `what-is-mcp`: the MCP intro slide from the PyHEP.dev deck.
-5. `trace`: the MCP Platform, animated gateway diagram; the agent speaks intent.
-6. `design`: security as architecture + "treat the agent like a new student"; closing quote.
+1. `title`
+2. `jfc`: bridge to the other rap talks (JFC paper arXiv:2603.20179, Kevin Flood, Zepeng Li)
+3. `prompt`: from prompt to discovery ("what is needed behind this URL?"), from AMG Weekly 2026-09-04
+4. `arch-swap`: model / harness / facility context & tools; "where do my job outputs go?"
+5. `what-is-mcp`: MCP intro (PyHEP.dev)
+6. `facility-native`: convenient, secure, auditable (AMG Weekly)
+7. `trace`: the MCP Platform, animated gateway diagram
+8. `behind-gateway`: MCP servers, identity brokering, others' servers (AMG Weekly)
+9. `capabilities`: MCP = arms and hands, skills = expertise, USATLAS marketplace (AMG Weekly)
+10. `clariphy`: CLARIPHY's curated awesome-hep-agentic-analysis list
+11. `design`: security as architecture + "treat the agent like a new student"; closing quote
+
+Sources beyond the two decks: the AMG Weekly talk PDF (`~/Downloads/20260904_AMGWeekly.pdf`,
+not committed) and the CLARIPHY awesome list.
 
 The audience is physicists, not computing people: keep the jargon high level.
 
@@ -49,7 +56,7 @@ The audience is physicists, not computing people: keep the jargon high level.
 
 ## Content rules (match these)
 
-- **Keep it short (title + five).** Aim for **40–50 words of visible text per slide**; depth goes
+- **Keep it short.** Aim for **40–50 words of visible text per slide**; depth goes
   into speaker notes.
 - **Voice:** Giordon's — plain, direct, first person, honest about failures. Don't
   reintroduce hype.

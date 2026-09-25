@@ -2,7 +2,7 @@
 
 Slides by Giordon Stark (University of Chicago) for the **UH Physics & Astronomy AI
 "rap session"** on AI agents for HEP data analysis (24 September 2026). Format per the
-session's DJ notes: an informal, open discussion, three slides per speaker (plus an intro), security saved
+session's DJ notes: an informal, open discussion, three slides per speaker (this deck runs longer; trim if the DJ holds the line), security saved
 for the end.
 
 **▶ View the deck:** https://kratsg.github.io/2026-09-24-uhawaii-colloquium-rap/
@@ -14,6 +14,9 @@ already has. The slides are cut down from two earlier talks:
 
 - the Nikhef colloquium, 2026-07-01 ([deck](https://kratsg.github.io/2026-07-01-nikhef-colloquium/#/arch-swap)):
   model / harness / facility-context framing, "ungrounded means silent", agents speak intent
+- ATLAS AMG Weekly, 2026-09-04 ("Towards Agentic Analysis"): prompt-to-discovery,
+  facility-native requirements, what the platform aggregates, capabilities and skills
+- CLARIPHY [awesome-hep-agentic-analysis](https://github.com/clariphy/awesome-hep-agentic-analysis)
 - PyHEP.dev 2026, 2026-09-07 ([repo](https://github.com/kratsg/2026-09-08-pyhepdev-mcp)):
   the AF MCP Platform, MCP server design, and security architecture
 
@@ -22,21 +25,17 @@ The research behind every claim, with commit-level citations, is in
 
 ## The slides
 
-A title slide plus five short slides (three core slides, one bridge, one MCP intro):
-
-1. **Title** (`#/title`).
-2. **"Just furnish context" … from where?** (`#/jfc`): picks up the thread from the JFC
-   paper ([arXiv:2603.20179](https://arxiv.org/abs/2603.20179)) and the talks by Kevin Flood
-   and Zepeng Li earlier in the session. At a real facility, the context sits behind logins.
-3. **Swap the model freely; context makes it useful** (`#/arch-swap`): model, harness,
-   facility context and tools, with a "where do my job outputs go?" example.
-4. **What is the Model Context Protocol?** (`#/what-is-mcp`): the intro slide from the PyHEP.dev deck.
-5. **The MCP Platform: one gateway, many MCP servers** (`#/trace`): the animated
-   mcp-portal gateway diagram. Credentials stay behind the broker, every call is authorized,
-   and the agent speaks intent.
-6. **Secure the architecture, design the interface** (`#/design`): security built into the
-   architecture, and "treat the agent like a new student" (clear tasks, a correct manual,
-   useful feedback).
+1. `title`
+2. `jfc`: bridge to the other rap talks (JFC paper arXiv:2603.20179, Kevin Flood, Zepeng Li)
+3. `prompt`: from prompt to discovery ("what is needed behind this URL?"), from AMG Weekly 2026-09-04
+4. `arch-swap`: model / harness / facility context & tools; "where do my job outputs go?"
+5. `what-is-mcp`: MCP intro (PyHEP.dev)
+6. `facility-native`: convenient, secure, auditable (AMG Weekly)
+7. `trace`: the MCP Platform, animated gateway diagram
+8. `behind-gateway`: MCP servers, identity brokering, others' servers (AMG Weekly)
+9. `capabilities`: MCP = arms and hands, skills = expertise, USATLAS marketplace (AMG Weekly)
+10. `clariphy`: CLARIPHY's curated awesome-hep-agentic-analysis list
+11. `design`: security as architecture + "treat the agent like a new student"; closing quote
 
 ## What's here
 
