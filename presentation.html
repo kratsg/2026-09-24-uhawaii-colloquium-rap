@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agents Need Context, Not Just Models — UH AI Rap Session</title>
+
+<!-- Reveal.js core -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.1/dist/reset.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.1/dist/reveal.css">
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- Custom styles (adapted from the throughput-computing deck's stylesheet) -->
+<link rel="stylesheet" href="styles.css">
+
+<!--
+  "Agents Need Context, Not Just Models" — Giordon Stark's three slides for the UH Physics &
+  Astronomy AI "rap session" (2026-09-24). Cut down from the PyHEP.dev 2026 MCP deck and the
+  Nikhef 2026-07-01 colloquium; the evidence behind every claim is in mcp-design-talk.md.
+  Editing conventions, theme, and the gotchas are in CLAUDE.md.
+-->
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ============================================================ -->
+<!-- UH Physics & Astronomy AI "rap session", 2026-09-24:         -->
+<!-- three slides per speaker (DJ rules). Cut down from the       -->
+<!-- PyHEP.dev deck; the full deck is the source of every claim.  -->
+<!-- ============================================================ -->
+
+<!-- 1. THE BIG PICTURE: swap the model, context is the job -->
+<section id="arch-swap">
+  <p class="kicker">UH AI Rap Session &middot; Giordon Stark (UChicago) &middot; 2026&#8209;09&#8209;24</p>
+  <h2>Swap the model freely; <span class="accent">context</span> makes it useful</h2>
+  <div class="content" style="justify-content:center; gap:22px;">
+    <div style="display:grid; grid-template-columns: 1fr 1fr 1.25fr; gap:18px; align-items:stretch;">
+      <div class="node slate" style="font-size:16pt; padding:16px;">Model<span class="sub">frontier API &middot; or self-hosted open weights</span></div>
+      <div class="node slate" style="font-size:16pt; padding:16px;">Harness<span class="sub">Claude Code &middot; Codex &middot; Copilot</span></div>
+      <div class="node fill" style="font-size:16pt; padding:16px;">Facility context &amp; tools<span class="sub">data, storage, batch, identity, fits &middot; via MCP servers</span></div>
+    </div>
+    <div class="callout">
+      <p style="margin:0;">The first two churn monthly and are interchangeable. The limiting factor is rarely the model: it's
+         <strong>reliable, secure access</strong> to the tools and data physicists already use.</p>
+    </div>
+    <div class="callout teal">
+      <p style="margin:0;">No context? It should <strong>stay quiet</strong>. Ours once tuned Lustre on a Ceph cluster: fluent, confident, wrong.</p>
+    </div>
+  </div>
+  <div class="footnote">Everything here runs in production at the UChicago ATLAS Analysis Facility &middot; <a href="https://mcp-portal.af.uchicago.edu/">mcp-portal.af.uchicago.edu</a></div>
+  <aside class="notes">
+    Hi, I'm Giordon, I build analysis-facility infrastructure at UChicago for ATLAS. Three slides, big picture.
+    The way I think about an agent is three blocks. The model, which you can swap: frontier API or open
+    weights you host yourself. The harness, Claude Code, Codex, Copilot, also swappable. And the third
+    block, the facility's context and tools: where the data lives, how you submit jobs, who you are. That
+    third block is the only durable, tractable piece, and it's the one we control. This is the "just
+    furnish context" point from the paper on the agenda, but in practice furnishing context is an
+    infrastructure problem, not a prompt problem.
+    Flip side: context isn't only what makes an agent useful, it's what makes it safe to trust. Our
+    cluster agents confidently recommended Lustre tuning on a filesystem that's actually Ceph. So our
+    rule is ungrounded means silent.
+  </aside>
+</section>
+
+<!-- 2. THE MCP PLATFORM: one gateway, many MCP servers -->
+
+<section id="trace">
+  <h2>The MCP Platform: <span class="accent">one gateway</span>, many MCP servers</h2>
+  <div class="content">
+    <div style="display:grid; grid-template-columns:1.22fr 0.78fr; gap:18px; align-items:stretch;">
+      <div class="pdiag-panel">
+        <p class="pdiag-url">mcp-portal.af.uchicago.edu &middot; live</p>
+        <div class="pdiag" id="pdiag" aria-label="How AI assistants reach the facility: an AI assistant speaks MCP to the MCP Gateway (auth, policy, audit, broker), which fans out to Rucio, HTCondor, Jupyter and storage. An animated pulse replays two authorized tool calls and one denied at policy.">
+          <div class="d-node d-client" data-pnode="client">AI Assistant
+            <span class="d-icon" aria-hidden="true"><span class="d-spin"></span><svg class="d-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="d-x" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 6l12 12M18 6L6 18" stroke-width="3" stroke-linecap="round"/></svg></span>
+          </div>
+          <div class="d-link" aria-hidden="true"><span class="d-linklabel">MCP</span></div>
+          <div class="d-node d-gateway" data-pnode="gateway">
+            <span class="d-gwname">MCP Gateway</span>
+            <div class="d-tags">
+              <span class="d-tag" data-gtag="auth">Auth <span class="d-icon" aria-hidden="true"><span class="d-spin"></span><svg class="d-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="d-x" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 6l12 12M18 6L6 18" stroke-width="3" stroke-linecap="round"/></svg></span></span>
+              <span class="d-tag" data-gtag="policy">Policy <span class="d-icon" aria-hidden="true"><span class="d-spin"></span><svg class="d-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="d-x" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 6l12 12M18 6L6 18" stroke-width="3" stroke-linecap="round"/></svg></span></span>
+              <span class="d-tag" data-gtag="audit">Audit <span class="d-icon" aria-hidden="true"><span class="d-spin"></span><svg class="d-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="d-x" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 6l12 12M18 6L6 18" stroke-width="3" stroke-linecap="round"/></svg></span></span>
+              <span class="d-tag" data-gtag="broker">Broker <span class="d-icon" aria-hidden="true"><span class="d-spin"></span><svg class="d-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="d-x" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 6l12 12M18 6L6 18" stroke-width="3" stroke-linecap="round"/></svg></span></span>
+            </div>
+          </div>
+          <div class="d-stem" aria-hidden="true"></div>
+          <div class="d-fanout">
+            <div class="d-branch" data-pnode="rucio">Rucio <span class="d-icon" aria-hidden="true"><span class="d-spin"></span><svg class="d-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="d-x" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 6l12 12M18 6L6 18" stroke-width="3" stroke-linecap="round"/></svg></span></div>
+            <div class="d-branch" data-pnode="htcondor">HTCondor <span class="d-icon" aria-hidden="true"><span class="d-spin"></span><svg class="d-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="d-x" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 6l12 12M18 6L6 18" stroke-width="3" stroke-linecap="round"/></svg></span></div>
+            <div class="d-branch">Jupyter <span class="d-icon" aria-hidden="true"><span class="d-spin"></span></span></div>
+            <div class="d-branch">Storage <span class="d-icon" aria-hidden="true"><span class="d-spin"></span></span></div>
+          </div>
+          <div class="d-pulse" data-pulse-dot aria-hidden="true"></div>
+          <div class="d-node d-cred" data-pnode="credential" aria-hidden="true"><span data-cred-label>x509</span></div>
+          <div class="d-chat" aria-hidden="true">
+            <div class="d-chatline" data-chat-line="0"><span class="d-chatrole">user</span><span class="d-chattext" data-chat-text></span></div>
+            <div class="d-chatline" data-chat-line="1"><span class="d-chatrole">ai</span><span class="d-chattext" data-chat-text></span></div>
+            <div class="d-chatline" data-chat-line="2"><span class="d-chatrole">ai</span><span class="d-chattext" data-chat-text></span></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:10px; justify-content:center;">
+        <div class="card teal"><h3 style="font-size:13pt;"><i class="fa-solid fa-shield-halved"></i> Credentials stay behind the broker</h3>
+          <p style="font-size:11pt;">The assistant never holds a raw credential; the user's token is never forwarded.</p></div>
+        <div class="card teal"><h3 style="font-size:13pt;"><i class="fa-solid fa-list-check"></i> Authorize every call</h3>
+          <p style="font-size:11pt;">Group-based access; denials audited too.</p></div>
+        <div class="card teal"><h3 style="font-size:13pt;"><i class="fa-solid fa-clock"></i> Short-lived, scoped</h3>
+          <p style="font-size:11pt;">Minted per service, cached at the broker, reused until expiry; the per-call copy is deleted after use.</p></div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:18px;">
+      <p style="margin:0;">The agent speaks <strong>intent</strong> ("get this dataset", "run on the cluster"); the facility wires the backend.
+         Adding the Nth MCP server is <strong>config</strong>, never a change to the server itself.</p>
+    </div>
+  </div>
+  <div class="footnote"><a href="https://mcp-portal.af.uchicago.edu/">mcp-portal.af.uchicago.edu</a> &middot; the portal landing page's own animation (<a href="https://github.com/maniaclab/af-mcp-platform">af-mcp-platform</a>).</div>
+  <aside class="notes">
+    This is the platform in one animated call: the portal landing page's own diagram, reproduced
+    in the slide. Let it run one cycle while talking. Two authorized calls play through: the
+    assistant asks, Auth, Policy, and Audit check green, the Broker mints a credential off to
+    the side, the call lands on Rucio or HTCondor, and the answer comes back. The third cycle is
+    the governance story in eight seconds: "Delete my /data datasets" passes Auth, fails Policy,
+    the gateway buzzes red, and the assistant reports it is not authorized.
+    Three things to say over it: credentials stay behind the broker, so the assistant never
+    holds anything raw and the user's token is never forwarded downstream. Every call is
+    authorized against group-based permissions, and the denials get audited too. And every
+    credential is minted short-lived for exactly one service, used once, and deleted.
+    And the design idea underneath, which I showed at Nikhef: the agent speaks intent, "get this
+    dataset", "run this on the cluster", and the facility wires that to Rucio, HTCondor, whatever
+    the backend is. Adding the next MCP server is configuration, never a change to the server.
+  </aside>
+</section>
+
+<!-- 3. SECURITY BY ARCHITECTURE, AGENTS BY DESIGN -->
+<section id="design">
+  <h2>Secure the <span class="accent">architecture</span>, design the <span class="accent">interface</span></h2>
+  <div class="content" style="gap:18px; justify-content:center;">
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:22px;">
+      <div class="card">
+        <h3><i class="fa-solid fa-shield-halved card-icon" style="font-size:15pt;"></i> Security is structural</h3>
+        <ul>
+          <li><strong>No tool takes a username</strong>: identity comes from the verified token, never the LLM</li>
+          <li><strong>No credentials in the MCP</strong>: vault &rarr; mint per call &rarr; use once &rarr; delete</li>
+          <li><strong>Permissions decided once</strong>, at the gateway; new tools are opt-in</li>
+        </ul>
+      </div>
+      <div class="card teal">
+        <h3><i class="fa-solid fa-compass-drafting card-icon" style="font-size:15pt;"></i> Agents are only as good as their tools</h3>
+        <ul>
+          <li><strong>One domain per server</strong>, with written non-goals</li>
+          <li><strong>Docstrings are the manual</strong>: tested against the live service</li>
+          <li><strong>Bounded outputs</strong>; errors <strong>name the next tool</strong> to call</li>
+        </ul>
+      </div>
+    </div>
+    <blockquote style="font-size:22pt; margin-top:4px;">Interoperable tool interfaces are likely to matter more than model-specific integrations.</blockquote>
+  </div>
+  <div class="footnote">Giordon Stark &middot; kratsg &middot; details + ~40 "tried X, found Y" lessons: <a href="https://github.com/kratsg/2026-09-08-pyhepdev-mcp/blob/main/mcp-design-talk.md">mcp-design-talk.md</a> &middot; slides AI-assisted by Claude (Anthropic).</div>
+  <aside class="notes">
+    Security, saved for the end as requested. The key idea: don't ask the model to be
+    trustworthy, make the architecture not care. No tool in our fleet takes a username, so the schema
+    literally can't express "read Bob's files"; who you are comes from the verified identity on every
+    call. No MCP server holds a credential: the broker pulls from a vault, mints something short-lived
+    for exactly one service, it's used once and deleted. And permissions are decided in exactly one
+    place, the gateway, from plain group-based RBAC. A brand new tool stays off until an operator maps it.
+    The other half is agent design. The model experiences your tools only through names, docstrings,
+    outputs and errors. So: one domain per server. Docstrings are the model's manual; ours reproduced a
+    broken example verbatim, so now they're tested against the live service. Bound every output, since
+    raw API rows swamped the model. And errors should say what to call next so the agent recovers.
+    Close: interoperable tool interfaces will matter more than model-specific integrations. Design the
+    interface for the model, design the architecture for the credential.
+  </aside>
+</section>
+
+</div>
+</div>
+
+<!-- Build stamp: deploy.yml rewrites the inner text to "<short-sha> · <date>" at publish time;
+     stays "dev" for local viewing. Top-right, links to the repo; slide number is bottom-left. -->
+<div class="build-stamp"><a href="https://github.com/kratsg/2026-09-24-uhawaii-colloquium-rap" id="buildstamp" target="_blank" rel="noopener">dev</a></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.1/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.1/dist/plugin/notes.js"></script>
+<script>
+Reveal.initialize({
+  width: 1280,
+  height: 720,
+  margin: 0,
+  controls: true,
+  progress: true,
+  slideNumber: 'c/t',
+  hash: true,
+  transition: 'slide',
+  center: false,
+  plugins: [ RevealNotes ]
+});
+</script>
+<script>
+/* The proof-gateway slide's "gateway pulse" — a faithful vanilla-JS port of the
+   mcp-portal.af.uchicago.edu landing page's one motion moment (af-mcp-platform:
+   portal/src/lib/gatewayPulse.ts). Three scripted cycles on loop: two authorized
+   tool calls (Rucio, HTCondor) and one denied at Policy. Plays only while the
+   slide is on screen (Reveal events stand in for the portal's ScrollTrigger);
+   skipped under prefers-reduced-motion or if GSAP failed to load — the static
+   diagram is complete without it, exactly as on the portal. */
+(function () {
+  if (typeof gsap === 'undefined') return;
+  if (/[?&]export/.test(window.location.search)) return; /* decktape/PDF export: keep the static diagram */
+  if (!window.matchMedia('(prefers-reduced-motion: no-preference)').matches) return;
+  var root = document.getElementById('pdiag');
+  if (!root) return;
+
+  var CYCLES = [
+    { user: 'find me a dataset', call: 'tool_call(rucio_list_dsids)', result: 'Found 3 datasets...',
+      tags: { auth: 'ok', policy: 'ok', audit: 'ok' }, cred: 'x509', target: 'rucio' },
+    { user: 'launch a batch job', call: 'tool_call(condor_submit_job)', result: 'Launched job 293813.0',
+      tags: { auth: 'ok', policy: 'ok', audit: 'ok' }, cred: 'condor-token', target: 'htcondor' },
+    { user: 'Delete my /data datasets', call: 'tool_call(fs_delete_dir)', result: 'I am not authorized...',
+      tags: { auth: 'ok', policy: 'fail', audit: 'fail' }, cred: null, target: null }
+  ];
+
+  var T = { chatReveal: 0.3, chatHoldShort: 0.55, chatHoldFinal: 1.9, chatCollapse: 0.4,
+    thinkHold: 0.8, clearOffset: 0.12, dotFade: 0.15, travelShort: 0.3, travelMed: 0.4,
+    travelLong: 0.55, settleGap: 0.1, tagCheck: 0.22, tagResolveHold: 0.18, deniedGap: 0.55,
+    brokerCheckDelay: 0.15, credentialAppear: 0.2, credHold: 0.35, credentialVanish: 0.3,
+    targetCheckHold: 0.3, arrivalHold: 0.45 };
+
+  function q(sel) { return root.querySelector(sel); }
+  var refs = {
+    client: q('[data-pnode="client"]'), gateway: q('[data-pnode="gateway"]'),
+    fanout: q('.d-fanout'), credential: q('[data-pnode="credential"]'),
+    credLabel: q('[data-cred-label]'), dot: q('[data-pulse-dot]'),
+    tags: { auth: q('[data-gtag="auth"]'), policy: q('[data-gtag="policy"]'),
+      audit: q('[data-gtag="audit"]'), broker: q('[data-gtag="broker"]') },
+    leaves: { rucio: q('[data-pnode="rucio"]'), htcondor: q('[data-pnode="htcondor"]') },
+    chat: Array.prototype.map.call(root.querySelectorAll('[data-chat-line]'), function (w) {
+      return { wrap: w, text: w.querySelector('[data-chat-text]') };
+    })
+  };
+
+  /* Reveal scales the whole deck with a CSS transform, so rect deltas (screen px)
+     must be divided by Reveal.getScale() before use as GSAP x/y (local px). All
+     positions are read fresh at tween start, so window resizes between loops are
+     picked up automatically — same trick as the portal's original. */
+  function scale() { return (window.Reveal && Reveal.getScale && Reveal.getScale()) || 1; }
+  function rect() { return root.getBoundingClientRect(); }
+  function cx(el, c) { var r = el.getBoundingClientRect(); return (r.left + r.width / 2 - c.left) / scale(); }
+  function cy(el, c) { var r = el.getBoundingClientRect(); return (r.top + r.height / 2 - c.top) / scale(); }
+  function ty(el, c) { return (el.getBoundingClientRect().top - c.top) / scale(); }
+  function by(el, c) { return (el.getBoundingClientRect().bottom - c.top) / scale(); }
+  function lx(el, c) { return (el.getBoundingClientRect().left - c.left) / scale(); }
+  function rx(el, c) { return (el.getBoundingClientRect().right - c.left) / scale(); }
+  function setState(el, s) { if (s) { el.dataset.state = s; } else { delete el.dataset.state; } }
+
+  function Seq(tl) { this.tl = tl; this.t = 0; }
+  Seq.prototype.mark = function (fn) { this.tl.call(fn, null, this.t); return this; };
+  Seq.prototype.markAt = function (fn, off) { this.tl.call(fn, null, this.t + off); return this; };
+  Seq.prototype.wait = function (d) { this.t += d; return this; };
+  Seq.prototype.tween = function (tg, vars, d) { vars.duration = d; this.tl.to(tg, vars, this.t); this.t += d; return this; };
+  Seq.prototype.tweenC = function (tg, vars, d) { vars.duration = d; this.tl.to(tg, vars, this.t); return this; };
+  Seq.prototype.moveTo = function (el, vars, d) { vars.ease = 'power1.inOut'; return this.tween(el, vars, d); };
+  Seq.prototype.appear = function (el, x, y) { this.mark(function () { gsap.set(el, { x: x, y: y }); }); return this.tween(el, { opacity: 1 }, T.dotFade); };
+  Seq.prototype.vanish = function (el) { return this.tween(el, { opacity: 0 }, T.dotFade); };
+  Seq.prototype.checkTag = function (el, outcome) {
+    return this.mark(function () { setState(el, 'checking'); }).wait(T.tagCheck)
+      .mark(function () { setState(el, outcome); }).wait(T.tagResolveHold);
+  };
+
+  function buildCycle(cycle) {
+    var tl = gsap.timeline();
+    var seq = new Seq(tl);
+    var client = refs.client, gateway = refs.gateway, fanout = refs.fanout,
+      credential = refs.credential, credLabel = refs.credLabel, dot = refs.dot,
+      tags = refs.tags, chat = refs.chat;
+
+    function reveal(i, text) {
+      seq.mark(function () { chat[i].text.textContent = text; });
+      seq.tween(chat[i].wrap, { height: 'auto', opacity: 1, ease: 'power2.out' }, T.chatReveal);
+    }
+
+    reveal(0, cycle.user);
+    seq.wait(T.chatHoldShort);
+
+    seq.appear(dot, function () { return lx(chat[0].wrap, rect()); }, function () { return cy(chat[0].wrap, rect()); });
+    seq.moveTo(dot, { x: function () { return cx(client, rect()); }, y: function () { return cy(client, rect()); } }, T.travelMed);
+    seq.mark(function () { client.classList.add('is-pulse-active'); setState(client, 'checking'); });
+    seq.vanish(dot);
+    seq.wait(T.thinkHold);
+
+    reveal(1, cycle.call);
+    seq.wait(T.chatHoldShort);
+
+    seq.appear(dot, function () { return cx(client, rect()); }, function () { return by(client, rect()); });
+    seq.mark(function () { client.classList.remove('is-pulse-active'); });
+    seq.moveTo(dot, { y: function () { return ty(gateway, rect()); } }, T.travelLong);
+    seq.mark(function () { gateway.classList.add('is-pulse-active'); });
+    seq.vanish(dot);
+    seq.wait(T.settleGap);
+
+    var denied = false;
+    ['auth', 'policy', 'audit'].forEach(function (k) {
+      var outcome = cycle.tags[k];
+      seq.checkTag(tags[k], outcome);
+      if (outcome === 'fail') denied = true;
+    });
+
+    if (denied) {
+      seq.mark(function () { gateway.classList.remove('is-pulse-active'); gateway.classList.add('is-pulse-denied'); });
+      seq.wait(T.deniedGap);
+      seq.appear(dot, function () { return cx(gateway, rect()); }, function () { return ty(gateway, rect()); });
+      seq.mark(function () { gateway.classList.remove('is-pulse-denied'); });
+      seq.moveTo(dot, { y: function () { return cy(client, rect()); } }, T.travelLong);
+    } else {
+      seq.mark(function () { setState(tags.broker, 'checking'); });
+      seq.wait(T.brokerCheckDelay);
+      seq.mark(function () {
+        credLabel.textContent = cycle.cred || '';
+        var gw = gateway.getBoundingClientRect(), r = rect(), s = scale();
+        gsap.set(credential, {
+          x: (gw.right - r.left) / s + 16,
+          y: (gw.top - r.top) / s + (gw.height / s) / 2 - credential.offsetHeight / 2
+        });
+      });
+      seq.tween(credential, { opacity: 1 }, T.credentialAppear);
+
+      seq.appear(dot, function () { return rx(gateway, rect()); }, function () { return cy(gateway, rect()); });
+      seq.moveTo(dot, { x: function () { return cx(credential, rect()); }, y: function () { return cy(credential, rect()); } }, T.travelMed);
+      seq.mark(function () { credential.classList.add('is-pulse-active'); });
+      seq.vanish(dot);
+      seq.wait(T.credHold);
+
+      seq.appear(dot, function () { return cx(credential, rect()); }, function () { return cy(credential, rect()); });
+      seq.mark(function () { credential.classList.remove('is-pulse-active'); });
+      seq.moveTo(dot, { x: function () { return rx(gateway, rect()); }, y: function () { return cy(gateway, rect()); } }, T.travelMed);
+      seq.mark(function () { setState(tags.broker, 'ok'); });
+      seq.tweenC(dot, { opacity: 0 }, T.dotFade);
+      seq.tween(credential, { opacity: 0 }, T.credentialVanish);
+
+      var target = cycle.target ? refs.leaves[cycle.target] : null;
+      if (target) {
+        seq.appear(dot, function () { return cx(gateway, rect()); }, function () { return by(gateway, rect()); });
+        seq.mark(function () { gateway.classList.remove('is-pulse-active'); });
+        seq.moveTo(dot, { y: function () { return ty(fanout, rect()); } }, T.travelShort);
+        seq.moveTo(dot, { x: function () { return cx(target, rect()); } }, T.travelMed);
+        seq.moveTo(dot, { y: function () { return ty(target, rect()); } }, T.travelShort);
+        seq.mark(function () { target.classList.add('is-pulse-active'); setState(target, 'checking'); });
+        seq.vanish(dot);
+        seq.wait(T.targetCheckHold);
+        seq.mark(function () { setState(target, 'ok'); });
+        seq.wait(T.arrivalHold);
+
+        seq.appear(dot, function () { return cx(target, rect()); }, function () { return ty(target, rect()); });
+        seq.mark(function () { target.classList.remove('is-pulse-active'); });
+        seq.moveTo(dot, { y: function () { return ty(fanout, rect()); } }, T.travelShort);
+        seq.moveTo(dot, { x: function () { return cx(gateway, rect()); } }, T.travelMed);
+        seq.moveTo(dot, { y: function () { return by(gateway, rect()); } }, T.travelShort);
+        seq.moveTo(dot, { y: function () { return cy(client, rect()); } }, T.travelLong);
+      }
+    }
+
+    seq.markAt(function () { setState(client, ''); client.classList.remove('is-pulse-active'); }, T.clearOffset);
+    seq.moveTo(dot, {
+      x: function () { return lx(chat[2].wrap, rect()); },
+      y: function () { return cy(chat[2].wrap, rect()); }
+    }, T.travelMed);
+    seq.vanish(dot);
+    seq.wait(T.settleGap);
+
+    reveal(2, cycle.result);
+    seq.wait(T.chatHoldFinal);
+
+    seq.mark(function () { client.classList.remove('is-pulse-active'); });
+    seq.tween(chat.map(function (l) { return l.wrap; }), { height: 0, opacity: 0, ease: 'power2.in' }, T.chatCollapse);
+    seq.mark(function () {
+      setState(tags.auth, ''); setState(tags.policy, ''); setState(tags.audit, ''); setState(tags.broker, '');
+      if (cycle.target) setState(refs.leaves[cycle.target], '');
+    });
+    return tl;
+  }
+
+  function resetAll() {
+    ['auth', 'policy', 'audit', 'broker'].forEach(function (k) { setState(refs.tags[k], ''); });
+    ['rucio', 'htcondor'].forEach(function (k) {
+      setState(refs.leaves[k], '');
+      refs.leaves[k].classList.remove('is-pulse-active');
+    });
+    setState(refs.client, '');
+    refs.client.classList.remove('is-pulse-active');
+    refs.gateway.classList.remove('is-pulse-active', 'is-pulse-denied');
+    refs.credential.classList.remove('is-pulse-active');
+    gsap.set(refs.dot, { opacity: 0 });
+    gsap.set(refs.credential, { opacity: 0 });
+    refs.chat.forEach(function (l) { gsap.set(l.wrap, { height: 0, opacity: 0 }); });
+  }
+
+  var master = gsap.timeline({ repeat: -1, repeatDelay: 1.3, paused: true });
+  CYCLES.forEach(function (c) { master.add(buildCycle(c)); });
+
+  function sync() {
+    var cur = Reveal.getCurrentSlide && Reveal.getCurrentSlide();
+    if (cur && cur.contains(root)) {
+      master.play();
+    } else if (master.progress() > 0 || master.isActive()) {
+      /* Rewind, not just pause: .call() side effects (classes, tag states,
+         chat text) outlive a plain pause, so clear them for a clean re-entry. */
+      master.pause(0);
+      resetAll();
+    }
+  }
+  Reveal.on('ready', sync);
+  Reveal.on('slidechanged', sync);
+})();
+</script>
+</body>
+</html>
