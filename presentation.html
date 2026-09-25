@@ -30,9 +30,76 @@
 <!-- PyHEP.dev deck; the full deck is the source of every claim.  -->
 <!-- ============================================================ -->
 
+<section id="title">
+  <div style="display:grid; grid-template-columns: 1.25fr 0.85fr; gap:40px; align-items:center; width:100%;">
+    <div>
+      <p class="kicker">UH Physics &amp; Astronomy &middot; AI Rap Session &middot; 2026&#8209;09&#8209;24</p>
+      <h1 style="font-size:42pt;">Agents Need Context, Not Just Models</h1>
+      <p class="subtitle">Furnishing context safely at a real analysis facility</p>
+      <p class="byline">Giordon Stark (University&nbsp;of&nbsp;Chicago) &middot; everything shown runs in production on the UChicago ATLAS Analysis Facility</p>
+      <!-- the UChicago seal in the strip is white; the dark card keeps it visible on the off-white page -->
+      <img src="images/logos.png" alt="University of Chicago, MANIAC Lab, Enrico Fermi Institute, IRIS-HEP, CERN" style="max-width:100%; margin-top:32px; background:#333; border-radius:10px; padding:10px 16px; box-sizing:border-box;">
+    </div>
+    <div style="text-align:center;">
+      <!-- title-hero.png is de-ATLAS-branded, generic AI-for-research-computing art -->
+      <img src="images/title-hero.png" alt="Agentic intelligence for research computing" style="max-width:100%; max-height:540px; border-radius:12px; box-shadow:0 8px 28px rgba(92,0,0,0.20);">
+    </div>
+  </div>
+  <div class="footnote">Slides AI-assisted by Claude (Anthropic) &middot; title illustration AI-generated. &middot; <a href="https://indico.phys.hawaii.edu/event/2985/">UH AI Rap Session</a></div>
+  <aside class="notes">
+    Quick intro: I'm a Deaf experimental physicist at the University of Chicago. I build
+    statistical tools like pyhf and the analysis-facility infrastructure ATLAS physics runs on.
+    My take for this rap session: the limiting factor is rarely the model itself. The hard part
+    is giving it reliable, secure access to the tools, data, and domain knowledge we already use.
+    Everything I show runs in production at the UChicago ATLAS Analysis Facility today.
+  </aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 2. WHAT IS MCP (vertical stack: main + build-one BACKUP)     -->
+
+<!-- BRIDGE: tie in the other rap talks (JFC paper, Kevin Flood, Zepeng Li) -->
+<section id="jfc">
+  <p class="kicker">Picking up the thread</p>
+  <h2>&ldquo;Just furnish context&rdquo; &hellip; <span class="accent">from where?</span></h2>
+  <div class="content" style="justify-content:center; gap:22px;">
+    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:18px;">
+      <div class="card">
+        <h3>JFC paper</h3>
+        <p style="font-size:14pt;">Given a dataset, an execution framework, and prior papers, an agent ran a full analysis on open data.</p>
+      </div>
+      <div class="card">
+        <h3>Kevin</h3>
+        <p style="font-size:14pt;">A knowledge worker furnishes grounded context; every action passes an authority gate.</p>
+      </div>
+      <div class="card">
+        <h3>Zepeng</h3>
+        <p style="font-size:14pt;">Models went from failing college physics to handling research tasks.</p>
+      </div>
+    </div>
+    <div class="callout teal">
+      <p style="margin:0;">At a real facility, context lives behind logins: data catalogs, batch, storage, <em>your</em> credentials.
+         How do we furnish it to everyone, <strong>safely</strong>?</p>
+    </div>
+  </div>
+  <div class="footnote">Moreno <em>et al.</em>, <a href="https://arxiv.org/abs/2603.20179">arXiv:2603.20179</a> &middot; K. Flood and Z. Li, earlier in this session</div>
+  <aside class="notes">
+    I want to pick up where the earlier talks left off. The JFC paper, just furnish context:
+    give Claude Code a dataset, an execution framework, and the prior literature, and it gets
+    through a full analysis on open data. Kevin showed a factorized pipeline where a knowledge
+    worker furnishes grounded context, and nothing acts without passing an authority gate.
+    Zepeng showed how fast the models themselves have improved.
+    So I'll take "can it do the analysis" as settled enough, and ask the facility question.
+    On open data on a laptop, furnishing context is easy. At a real facility, the context lives
+    in services behind logins: the dataset catalog, the batch system, storage, and your personal
+    grid credentials. How do we give that to every user's agent without handing the model the
+    keys? That's what my three slides are about.
+  </aside>
+</section>
+
 <!-- 1. THE BIG PICTURE: swap the model, context is the job -->
 <section id="arch-swap">
-  <p class="kicker">UH AI Rap Session &middot; Giordon Stark (UChicago) &middot; 2026&#8209;09&#8209;24</p>
+  <p class="kicker">The big picture</p>
   <h2>Swap the model freely; <span class="accent">context</span> makes it useful</h2>
   <div class="content" style="justify-content:center; gap:22px;">
     <div style="display:grid; grid-template-columns: 1fr 1fr 1.25fr; gap:18px; align-items:stretch;">
@@ -45,7 +112,8 @@
          <strong>reliable, secure access</strong> to the tools and data physicists already use.</p>
     </div>
     <div class="callout teal">
-      <p style="margin:0;">No context? It should <strong>stay quiet</strong>. Ours once tuned Lustre on a Ceph cluster: fluent, confident, wrong.</p>
+      <p style="margin:0;">&ldquo;Where should my job outputs go?&rdquo; A generic model says your home area, and the quota fills in minutes.
+         One that knows the facility says fast local scratch. <strong>Same model, more context.</strong></p>
     </div>
   </div>
   <div class="footnote">Everything here runs in production at the UChicago ATLAS Analysis Facility &middot; <a href="https://mcp-portal.af.uchicago.edu/">mcp-portal.af.uchicago.edu</a></div>
@@ -57,11 +125,49 @@
     third block is the only durable, tractable piece, and it's the one we control. This is the "just
     furnish context" point from the paper on the agenda, but in practice furnishing context is an
     infrastructure problem, not a prompt problem.
-    Flip side: context isn't only what makes an agent useful, it's what makes it safe to trust. Our
-    cluster agents confidently recommended Lustre tuning on a filesystem that's actually Ceph. So our
-    rule is ungrounded means silent.
+    A concrete example. Ask a generic model where your batch job's outputs should go and it'll say
+    next to the job, your home area, and the big files blow your quota in minutes. A model that knows
+    the facility sends big outputs to fast local scratch and keeps small summaries in the backed-up
+    home. The model didn't get smarter; we gave it context. And the flip side: without context it
+    should stay quiet. Ours once confidently recommended tuning for the wrong filesystem, so our rule
+    is ungrounded means silent.
   </aside>
 </section>
+
+<!-- WHAT IS MCP (intro, from the PyHEP.dev deck) -->
+<section id="what-is-mcp">
+  <h2>What is the Model Context Protocol?</h2>
+  <div class="content" style="justify-content:center; gap:26px;">
+    <p class="text-lg" style="margin:0;">An open protocol connecting AI assistants (LLMs like Claude or Gemini) to the libraries, databases, and services scientists already use.</p>
+    <div style="display:flex; align-items:center; gap:0;">
+      <div class="node teal" style="flex:1.1;">AI assistant<span class="sub">Claude, Gemini CLI, VS&nbsp;Code, &hellip;</span></div>
+      <div style="flex:0.8; text-align:center;">
+        <p class="mono text-teal" style="margin:0 0 2px 0; font-size:11pt; font-weight:600;">MCP (JSON-RPC)</p>
+        <p class="flow-arrow" style="margin:0;">&#10231;</p>
+      </div>
+      <div class="node" style="flex:1.2;">MCP server<span class="sub">you write this &middot; runs on your laptop or hosted at a facility</span></div>
+      <div style="flex:0.8; text-align:center; padding:0 8px;">
+        <p class="mono text-muted" style="margin:0 0 2px 0; font-size:10pt;">Python &middot; subprocess &middot; REST</p>
+        <p class="flow-arrow" style="margin:0;">&#10231;</p>
+      </div>
+      <div class="node slate" style="flex:1.2;">Existing library or service<span class="sub">rucio.client, pyAMI, HTCondor, &hellip;</span></div>
+    </div>
+    <p class="text-center" style="margin:0;"><span class="tag">tools</span> functions the LLM calls &nbsp;&nbsp;&nbsp;&nbsp;<span class="tag teal">resources</span> data it reads &nbsp;&nbsp;&nbsp;&nbsp;<span class="tag slate">prompts</span> reusable templates</p>
+  </div>
+  <div class="footnote"><a href="https://modelcontextprotocol.io">modelcontextprotocol.io</a> &middot; not prompt engineering, not a custom foundation model</div>
+  <aside class="notes">
+    One minute of level-setting. The Model Context Protocol is an open protocol, originally from
+    Anthropic, now with a public spec and SDKs everywhere. The assistant, whatever it is, Claude,
+    Gemini CLI, an editor, speaks MCP to a server someone writes. That server can run on your laptop
+    or be hosted at a facility, and it talks to what we already have: rucio for datasets, AMI for
+    metadata, HTCondor for batch.
+    In JFC terms, this is a standard way to plug in the "execution framework" and the context, so
+    it works with any model. Tools are the primitive that matters in practice: typed functions the
+    model can call, described by a name, a schema, and a docstring. Not prompt engineering, not a
+    custom model: ordinary interface design for an unusual caller.
+  </aside>
+</section>
+
 
 <!-- 2. THE MCP PLATFORM: one gateway, many MCP servers -->
 
@@ -147,11 +253,11 @@
         </ul>
       </div>
       <div class="card teal">
-        <h3><i class="fa-solid fa-compass-drafting card-icon" style="font-size:15pt;"></i> Agents are only as good as their tools</h3>
+        <h3><i class="fa-solid fa-user-graduate card-icon" style="font-size:15pt;"></i> Treat the agent like a new student</h3>
         <ul>
-          <li><strong>One domain per server</strong>, with written non-goals</li>
-          <li><strong>Docstrings are the manual</strong>: tested against the live service</li>
-          <li><strong>Bounded outputs</strong>; errors <strong>name the next tool</strong> to call</li>
+          <li><strong>Clear, narrow tasks</strong>: "find this dataset", not a raw API</li>
+          <li><strong>A correct manual</strong>: it copies examples verbatim, so test them</li>
+          <li><strong>Useful feedback</strong>: short answers; errors that say what to try next</li>
         </ul>
       </div>
     </div>
@@ -165,10 +271,12 @@
     call. No MCP server holds a credential: the broker pulls from a vault, mints something short-lived
     for exactly one service, it's used once and deleted. And permissions are decided in exactly one
     place, the gateway, from plain group-based RBAC. A brand new tool stays off until an operator maps it.
-    The other half is agent design. The model experiences your tools only through names, docstrings,
-    outputs and errors. So: one domain per server. Docstrings are the model's manual; ours reproduced a
-    broken example verbatim, so now they're tested against the live service. Bound every output, since
-    raw API rows swamped the model. And errors should say what to call next so the agent recovers.
+    The other half is agent design, and the best mental model I have is a new grad student. Give it
+    clear, narrow tasks shaped like how a physicist asks, "find this dataset", rather than a raw API
+    dump. Give it a correct manual: the tool descriptions are what it reads, and ours once copied a
+    broken example verbatim, so now we test every example against the live service. And give it
+    useful feedback: keep answers short, since raw API rows swamped the model, and make every error
+    say what to try next so it can recover on its own.
     Close: interoperable tool interfaces will matter more than model-specific integrations. Design the
     interface for the model, design the architecture for the credential.
   </aside>

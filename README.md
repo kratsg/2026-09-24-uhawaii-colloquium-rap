@@ -1,8 +1,8 @@
 # Agents Need Context, Not Just Models
 
-Three slides by Giordon Stark (University of Chicago) for the **UH Physics & Astronomy AI
+Slides by Giordon Stark (University of Chicago) for the **UH Physics & Astronomy AI
 "rap session"** on AI agents for HEP data analysis (24 September 2026). Format per the
-session's DJ notes: an informal, open discussion, three slides per speaker, security saved
+session's DJ notes: an informal, open discussion, three slides per speaker (plus an intro), security saved
 for the end.
 
 **▶ View the deck:** https://kratsg.github.io/2026-09-24-uhawaii-colloquium-rap/
@@ -20,17 +20,23 @@ already has. The slides are cut down from two earlier talks:
 The research behind every claim, with commit-level citations, is in
 [`mcp-design-talk.md`](mcp-design-talk.md).
 
-## The three slides
+## The slides
 
-1. **Swap the model freely; context makes it useful** (`#/arch-swap`): model, harness,
-   facility context and tools; no context means it should stay quiet.
-2. **The MCP Platform: one gateway, many MCP servers** (`#/trace`): the animated
-   mcp-portal gateway diagram; credentials behind the broker, every call authorized, the
-   agent speaks intent.
-3. **Secure the architecture, design the interface** (`#/design`): security as structure
-   (no username params, no stored credentials, one permission gateway) plus what makes
-   tools good for agents (one domain per server, tested docstrings, bounded outputs,
-   errors that name the next tool).
+A title slide plus five short slides (three core slides, one bridge, one MCP intro):
+
+1. **Title** (`#/title`).
+2. **"Just furnish context" … from where?** (`#/jfc`): picks up the thread from the JFC
+   paper ([arXiv:2603.20179](https://arxiv.org/abs/2603.20179)) and the talks by Kevin Flood
+   and Zepeng Li earlier in the session. At a real facility, the context sits behind logins.
+3. **Swap the model freely; context makes it useful** (`#/arch-swap`): model, harness,
+   facility context and tools, with a "where do my job outputs go?" example.
+4. **What is the Model Context Protocol?** (`#/what-is-mcp`): the intro slide from the PyHEP.dev deck.
+5. **The MCP Platform: one gateway, many MCP servers** (`#/trace`): the animated
+   mcp-portal gateway diagram. Credentials stay behind the broker, every call is authorized,
+   and the agent speaks intent.
+6. **Secure the architecture, design the interface** (`#/design`): security built into the
+   architecture, and "treat the agent like a new student" (clear tasks, a correct manual,
+   useful feedback).
 
 ## What's here
 

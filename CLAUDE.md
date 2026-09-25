@@ -1,6 +1,6 @@
 # CLAUDE.md — working on this repo
 
-This repo is a **reveal.js deck of three slides**: "Agents Need Context, Not Just Models",
+This repo is a **short reveal.js deck** (title + five slides): "Agents Need Context, Not Just Models",
 Giordon Stark's contribution to the **UH Physics & Astronomy AI "rap session"**
 (2026-09-24, https://indico.phys.hawaii.edu/event/2985/). It is **public** and auto-deploys
 to GitHub Pages (https://kratsg.github.io/2026-09-24-uhawaii-colloquium-rap/).
@@ -18,11 +18,17 @@ It was cut down from the PyHEP.dev 2026 MCP deck (`kratsg/2026-09-08-pyhepdev-mc
 `arch-swap` / `arch-quiet` / `arch-intent` slides supply the big-picture framing. The
 citation-grade source for every claim is **`mcp-design-talk.md`** (committed).
 
-The three slides (keep it at three):
+The slides (keep it short: the session asked for three per speaker):
 
-1. `arch-swap`: model / harness / facility context & tools; "ungrounded means silent".
-2. `trace`: the MCP Platform, animated gateway diagram; the agent speaks intent.
-3. `design`: security as architecture + tool design for agents; closing quote.
+1. `title`: adapted from the PyHEP.dev title slide.
+2. `jfc`: bridge to the other rap talks (JFC paper arXiv:2603.20179, Kevin Flood's
+   factorized agent pipeline + authority gate, Zepeng Li's "models now handle research tasks").
+3. `arch-swap`: model / harness / facility context & tools; "where do my job outputs go?".
+4. `what-is-mcp`: the MCP intro slide from the PyHEP.dev deck.
+5. `trace`: the MCP Platform, animated gateway diagram; the agent speaks intent.
+6. `design`: security as architecture + "treat the agent like a new student"; closing quote.
+
+The audience is physicists, not computing people: keep the jargon high level.
 
 ## How to work on it
 
@@ -43,7 +49,7 @@ The three slides (keep it at three):
 
 ## Content rules (match these)
 
-- **Three slides, no more.** Aim for **40–50 words of visible text per slide**; depth goes
+- **Keep it short (title + five).** Aim for **40–50 words of visible text per slide**; depth goes
   into speaker notes.
 - **Voice:** Giordon's — plain, direct, first person, honest about failures. Don't
   reintroduce hype.
